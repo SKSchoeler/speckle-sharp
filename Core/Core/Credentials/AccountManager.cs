@@ -120,7 +120,7 @@ public static class AccountManager
 
       if (res.Errors is not null && res.Errors.Length != 0)
       {
-        throw new SpeckleException(res.Errors[0].Message, res.Errors);
+        throw new SpeckleGraphQLException<ActiveUserServerInfoResponse>(res.Errors[0].Message, request, res);
       }
 
       return res.Data;

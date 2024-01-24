@@ -5,7 +5,6 @@ using DesktopUI2.Models;
 using DesktopUI2.Models.Filters;
 using DesktopUI2.Models.Settings;
 using DesktopUI2.ViewModels;
-using Sentry.Reflection;
 using Speckle.Core.Kits;
 using Speckle.Core.Models;
 
@@ -16,9 +15,9 @@ public delegate void UpdateSelectedStream();
 
 public abstract class ConnectorBindings
 {
-  public string ConnectorVersion => Assembly.GetAssembly(GetType()).GetNameAndVersion().Version;
+  public string ConnectorVersion => Assembly.GetAssembly(GetType()).GetNameAndVersion().version;
 
-  public string ConnectorName => Assembly.GetAssembly(GetType()).GetNameAndVersion().Name;
+  public string ConnectorName => Assembly.GetAssembly(GetType()).GetNameAndVersion().name;
 
   //public List<StreamState> SavedStreamStates = new List<StreamState>();
 
