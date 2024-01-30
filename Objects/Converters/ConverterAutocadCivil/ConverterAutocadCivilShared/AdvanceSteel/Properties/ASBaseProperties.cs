@@ -8,7 +8,6 @@ using Autodesk.AdvanceSteel.DotNetRoots.Units;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Internal.DatabaseServices;
 using Objects.Structural.Analysis;
-using Sentry;
 using Speckle.Core.Kits;
 using Speckle.Newtonsoft.Json.Linq;
 using static Autodesk.AdvanceSteel.DotNetRoots.Units.Unit;
