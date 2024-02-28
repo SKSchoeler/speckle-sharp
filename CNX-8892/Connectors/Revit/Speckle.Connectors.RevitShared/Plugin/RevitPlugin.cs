@@ -112,8 +112,6 @@ internal class RevitPlugin : IRevitPlugin
       Debug.WriteLine(binding.Name);
       binding.Parent.AssociateWithBinding(binding, panel);
 
-      panel.Browser.JavascriptObjectRepository.Register(binding.Name, binding.Parent, true, _bindingOptions);
-
       // POC: something wrong here
       // _browserSender.SendRaw($"console.log('Registered: {binding.Name}')");
     }
@@ -159,13 +157,20 @@ internal class RevitPlugin : IRevitPlugin
 
     panel.Browser.IsBrowserInitializedChanged += (sender, e) =>
     {
-      if (panel.Browser.IsBrowserInitialized)
-      {
-        panel.Browser.Address = "https://deploy-preview-2076--boisterous-douhua-e3cefb.netlify.app/";
-      }
-
       // POC dev tools
       panel.ShowDevTools();
+
+      // binding the bindings to each bridge
+      List<IBinding> bindings = _bindings.Select(x => x.Value).ToList();
+      foreach (IBinding binding in bindings)
+      {
+        panel.Browser.JavascriptObjectRepository.Register(binding.Name, binding.Parent, true, _bindingOptions);
+
+        // POC: something wrong here
+        // _browserSender.SendRaw($"console.log('Registered: {binding.Name}')");
+      }
+
+      panel.Browser.Load("https://deploy-preview-2076--boisterous-douhua-e3cefb.netlify.app/");
 
       // POC: not sure where this comes from
 #if REVIT2020

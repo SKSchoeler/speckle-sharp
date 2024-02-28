@@ -124,11 +124,11 @@ public class BrowserBridge : IBridge
   /// <param name="args"></param>
   public void RunMethod(string methodName, string requestId, string args)
   {
-    if (methodName.ToLower() == "addmodel")
-    {
-      Debug.WriteLine($"RunMethod: {methodName}");
-      return;
-    }
+    //if (methodName.ToLower() == "addmodel")
+    //{
+    //  Debug.WriteLine($"RunMethod: {methodName}");
+    //  return;
+    //}
 
     _actionBlock.Post(
       new RunMethodArgs

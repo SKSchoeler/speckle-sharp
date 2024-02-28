@@ -23,13 +23,26 @@ internal class SendBinding : RevitBaseBinding, ICancelable
   public CancellationManager CancellationManager { get; } = new();
 
   private HashSet<string> ChangedObjectIds { get; set; } = new();
+  private readonly IRevitIdleManager _revitIdleManager;
 
-  public SendBinding(RevitContext revitContext, RevitDocumentStore store, IBridge bridge, IBrowserSender browserSender)
+  public SendBinding(
+    IRevitIdleManager revitIdleManager,
+    RevitContext revitContext,
+    RevitDocumentStore store,
+    IBridge bridge,
+    IBrowserSender browserSender
+  )
     : base("sendBinding", store, bridge, browserSender, revitContext)
   {
+    _revitIdleManager = revitIdleManager;
+
     // TODO expiry events
     // TODO filters need refresh events
-    revitContext.UIApplication.Application.DocumentChanged += (_, e) => DocChangeHandler(e);
+  }
+
+  public override void ConnectEvents()
+  {
+    _revitContext.UIApplication.Application.DocumentChanged += (_, e) => DocChangeHandler(e);
   }
 
   public List<ISendFilter> GetSendFilters()
@@ -155,8 +168,7 @@ internal class SendBinding : RevitBaseBinding, ICancelable
     }
 
     // TODO: CHECK IF ANY OF THE ABOVE ELEMENTS NEED TO TRIGGER A FILTER REFRESH
-    // POC: re-instate
-    //    RevitIdleManager.SubscribeToIdle(RunExpirationChecks);
+    _revitIdleManager.SubscribeToIdle(RunExpirationChecks);
   }
 
   private void RunExpirationChecks()
