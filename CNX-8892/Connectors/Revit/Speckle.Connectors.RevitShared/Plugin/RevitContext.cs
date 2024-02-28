@@ -24,5 +24,19 @@ namespace Speckle.Connectors.Revit.Plugin
         _uiApplication = value;
       }
     }
+
+    public CefSharpPanel? Panel
+    {
+      get => _panel;
+      set
+      {
+        if (_panel != null)
+        {
+          throw new ArgumentException("CefSharpPanel already set");
+        }
+
+        _panel = value;
+      }
+    }
   }
 }

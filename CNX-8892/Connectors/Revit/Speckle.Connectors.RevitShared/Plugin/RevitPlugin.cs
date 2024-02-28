@@ -15,6 +15,9 @@ using Speckle.Connectors.DUI.Bindings;
 using Autofac;
 using Speckle.Connectors.Revit.HostApp;
 using System.Diagnostics;
+using Autodesk.Revit.DB;
+using CefSharp.Event;
+using Sentry.Protocol;
 
 namespace Speckle.Connectors.Revit.Plugin;
 
@@ -27,7 +30,6 @@ internal class RevitPlugin : IRevitPlugin
   private readonly CefSharpPanel _panel;
   private readonly RevitContext _revitContext;
   private readonly IBrowserSender _browserSender;
-  private readonly CefSharpPanel _cefSharpPanel;
 
   public RevitPlugin(
     UIControlledApplication uIControlledApplication,
@@ -35,8 +37,7 @@ internal class RevitPlugin : IRevitPlugin
     IEnumerable<Lazy<IBinding>> bindings,
     BindingOptions bindingOptions,
     RevitContext revitContext,
-    IBrowserSender browserSender,
-    CefSharpPanel cefSharpPanel
+    IBrowserSender browserSender
   )
   {
     _uIControlledApplication = uIControlledApplication;
@@ -45,7 +46,6 @@ internal class RevitPlugin : IRevitPlugin
     _bindingOptions = bindingOptions;
     _revitContext = revitContext;
     _browserSender = browserSender;
-    _cefSharpPanel = cefSharpPanel;
   }
 
   public void Initialise()
@@ -101,35 +101,71 @@ internal class RevitPlugin : IRevitPlugin
   {
     CefSharpSettings.ConcurrentTaskExecution = true;
 
+    var panel = new CefSharpPanel();
+    panel.Browser.JavascriptObjectRepository.NameConverter = null;
+    _browserSender.SetActionScriptMethod(panel.ExecuteScriptAsync);
+
+    // binding the bindings to each bridge
+    List<IBinding> bindings = _bindings.Select(x => x.Value).ToList();
+    foreach (IBinding binding in bindings)
+    {
+      Debug.WriteLine(binding.Name);
+      binding.Parent.AssociateWithBinding(binding, panel);
+
+      panel.Browser.JavascriptObjectRepository.Register(binding.Name, binding.Parent, true, _bindingOptions);
+
+      // POC: something wrong here
+      // _browserSender.SendRaw($"console.log('Registered: {binding.Name}')");
+    }
+
+    // connect all the events AFTER they are bound
+    foreach (IBinding binding in bindings)
+    {
+      Debug.WriteLine(binding.Name);
+      binding.ConnectEvents();
+
+      // POC: something wrong here
+      // _browserSender.SendRaw($"console.log('Events connected: {binding.Name}')");
+    }
+
+    //panel.Browser.JavascriptObjectRepository.ResolveObject += (object sender, JavascriptBindingEventArgs e) =>
+    //{
+    //  // POC: debugging
+    //  var csharpObject = bindings.FirstOrDefault(x => x.Name.ToLower() == e.ObjectName.ToLower());
+    //  if (csharpObject != null)
+    //  {
+    //    // POC: logging
+    //    Debug.WriteLine("FOUND: " + e.ObjectName);
+    //    panel.Browser.ExecuteScriptAsync($"console.log('{e.ObjectName}')");
+
+    //    panel.Browser.JavascriptObjectRepository.Register(
+    //      csharpObject.Name,
+    //      csharpObject.Parent,
+    //      true,
+    //      _bindingOptions
+    //    );
+    //  }
+    //  else
+    //  {
+    //    Debug.WriteLine("*** NOT FOUND: " + e.ObjectName);
+    //  }
+    //};
+
     _uIControlledApplication.RegisterDockablePane(
       RevitExternalApplication.DoackablePanelId,
       _revitSettings.RevitPanelName,
-      _cefSharpPanel
+      panel
     );
 
-    // binding the bindings to each bridge
-    foreach (IBinding binding in _bindings.Select(x => x.Value))
+    panel.Browser.IsBrowserInitializedChanged += (sender, e) =>
     {
-      Debug.WriteLine(binding.Name);
-      binding.Parent.AssociateWithBinding(binding, _cefSharpPanel);
-    }
-
-    _cefSharpPanel.Browser.IsBrowserInitializedChanged += (sender, e) =>
-    {
-      // POC dev tools
-      _cefSharpPanel.ShowDevTools();
-
-      foreach (IBinding binding in _bindings.Select(x => x.Value))
+      if (panel.Browser.IsBrowserInitialized)
       {
-        IBridge bridge = binding.Parent;
-
-        _cefSharpPanel.Browser.JavascriptObjectRepository.Register(
-          bridge.FrontendBoundName,
-          bridge,
-          true,
-          _bindingOptions
-        );
+        panel.Browser.Address = "https://deploy-preview-2076--boisterous-douhua-e3cefb.netlify.app/";
       }
+
+      // POC dev tools
+      panel.ShowDevTools();
 
       // POC: not sure where this comes from
 #if REVIT2020
@@ -147,4 +183,7 @@ internal class RevitPlugin : IRevitPlugin
 #endif
     };
   }
+
+  private void JavascriptObjectRepository_ResolveObject(object sender, JavascriptBindingEventArgs e) =>
+    throw new NotImplementedException();
 }

@@ -30,11 +30,14 @@ internal class BasicConnectorBindingRevit : RevitBaseBinding, IBasicConnectorBin
     : base("baseBinding", store, bridge, browserSender, revitContext) // POC: name maybe should just take class name? i.e. nameof(BasicConnectorBindingRevit)
   {
     _revitSettings = revitSettings;
+  }
 
+  public override void ConnectEvents()
+  {
     // POC: event binding
     _store.DocumentChanged += (_, _) =>
     {
-      browserSender.Send(Name, BasicConnectorBindingEvents.DocumentChanged);
+      _browserSender.Send(Name, BasicConnectorBindingEvents.DocumentChanged);
     };
   }
 

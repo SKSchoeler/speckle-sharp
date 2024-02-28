@@ -7,6 +7,8 @@ namespace Speckle.Connectors.DUI.Bindings;
 /// </summary>
 public interface IBinding
 {
+  public void ConnectEvents();
+
   /// <summary>
   /// This will be the name under which it will be available in the Frontend, e.g.
   /// window.superBinding, or window.mapperBinding. Please use camelCase even if

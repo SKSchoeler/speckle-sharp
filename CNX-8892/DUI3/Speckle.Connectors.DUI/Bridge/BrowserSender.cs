@@ -10,9 +10,18 @@ public class BrowserSender : IBrowserSender
   private readonly JsonSerializerSettings _jsonSerializerSettings;
   private Action<string>? _scriptMethod;
 
-  public BrowserSender(JsonSerializerSettings jsonSerializerSettings, Action<string> scriptMethod)
+  public BrowserSender(JsonSerializerSettings jsonSerializerSettings)
   {
     _jsonSerializerSettings = jsonSerializerSettings;
+  }
+
+  public void SetActionScriptMethod(Action<string> scriptMethod)
+  {
+    if (_scriptMethod != null)
+    {
+      throw new InvalidOperationException("Browser script method already set");
+    }
+
     _scriptMethod = scriptMethod;
   }
 

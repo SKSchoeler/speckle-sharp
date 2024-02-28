@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Speckle.Core.Logging;
 using Speckle.Connectors.DUI.Bindings;
 using System.Threading.Tasks.Dataflow;
+using System.Diagnostics;
 
 namespace Speckle.Connectors.DUI.Bridge;
 
@@ -123,6 +124,12 @@ public class BrowserBridge : IBridge
   /// <param name="args"></param>
   public void RunMethod(string methodName, string requestId, string args)
   {
+    if (methodName.ToLower() == "addmodel")
+    {
+      Debug.WriteLine($"RunMethod: {methodName}");
+      return;
+    }
+
     _actionBlock.Post(
       new RunMethodArgs
       {

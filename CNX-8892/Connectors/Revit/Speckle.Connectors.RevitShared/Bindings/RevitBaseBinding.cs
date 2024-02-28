@@ -18,6 +18,8 @@ internal abstract class RevitBaseBinding : IBinding
   protected readonly IBrowserSender _browserSender;
   protected readonly RevitContext _revitContext;
 
+  public virtual void ConnectEvents() { }
+
   public RevitBaseBinding(
     string name,
     RevitDocumentStore store,

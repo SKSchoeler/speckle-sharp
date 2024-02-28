@@ -16,6 +16,8 @@ public class AccountBinding : IBinding
     Parent = bridge;
   }
 
+  public void ConnectEvents() { }
+
   public Account[] GetAccounts()
   {
     return AccountManager.GetAccounts().ToArray();

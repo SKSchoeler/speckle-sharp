@@ -110,6 +110,8 @@ public class App : IExternalApplication
         );
       }
 
+      CefSharpPanel.ShowDevTools();
+
 #if  REVIT2020
       // NOTE: Cef65 does not work with DUI3 in yarn dev mode. To test things you need to do `yarn build` and serve the build
       // folder at port 3000 (or change it to something else if you want to). Guru  meditation: Je sais, pas ideal. Mais q'est que nous pouvons faire? Rien. C'est l'autodesk vie.

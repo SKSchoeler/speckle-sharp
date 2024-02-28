@@ -38,13 +38,8 @@ class AutofacUIModule : Module
         Converters = { new DiscriminatedObjectConverter(), new AbstractConverter<DiscriminatedObject, ISendFilter>() }
       };
 
-    var panel = new CefSharpPanel();
-    panel.Browser.JavascriptObjectRepository.NameConverter = null;
-    var browserSender = new BrowserSender(settings, panel.Browser.ExecuteScriptAsync);
-    builder.RegisterInstance(panel).SingleInstance();
-
-    // POC: panel static is a bit meh :D
-    builder.RegisterInstance(browserSender).As<IBrowserSender>().SingleInstance();
+    // POC: BrowserSender, still needed now?
+    builder.RegisterType<BrowserSender>().As<IBrowserSender>().SingleInstance();
 
     builder.RegisterInstance(settings).SingleInstance();
     builder.RegisterType<BrowserBridge>().As<IBridge>().InstancePerDependency();
