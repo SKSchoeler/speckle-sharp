@@ -36,7 +36,14 @@ public class BasicConnectorBinding : IBasicConnectorBinding
 
   public DocumentModelStore GetDocumentState() => _store;
 
-  public void AddModel(ModelCard model) => _store.Models.Add(model);
+  public void AddModel(ModelCard model)
+  {
+    _store.Models.Add(model);
+    Parent.RunOnMainThread(() =>
+    {
+      _store.WriteToFile();
+    });
+  }
 
   public void UpdateModel(ModelCard model)
   {

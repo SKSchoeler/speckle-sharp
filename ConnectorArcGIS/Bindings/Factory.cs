@@ -15,7 +15,6 @@ public static class Factory
     SendBinding sendBinding = new(s_store);
     List<IBinding> bindingsList =
       new() { new ConfigBinding("ArcGIS"), new AccountBinding(), new TestBinding(), baseBindings, sendBinding };
-
     return bindingsList;
   }
 }

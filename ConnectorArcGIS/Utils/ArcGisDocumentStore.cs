@@ -1,4 +1,6 @@
-﻿using DUI3.Models;
+using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Framework.Threading.Tasks;
+using DUI3.Models;
 
 namespace ConnectorArcGIS.Utils;
 
@@ -9,9 +11,18 @@ public class ArcGisDocumentStore : DocumentModelStore
     // Subscribe here document related events like OnSave, OnClose, OnOpen etc...
   }
 
-  public override void WriteToFile()
+  public override async void WriteToFile()
   {
     // Implement the logic to save it to file
+    await QueuedTask
+      .Run(
+        () =>
+          Project.Current.SaveMetadataAsHTML(
+            @"C:\Users\katri\Documents\ArcGIS\Projects\OutputHTML.htm",
+            MDSaveAsHTMLOption.esriCurrentMetadataStyle
+          )
+      )
+      .ConfigureAwait(false);
   }
 
   public override void ReadFromFile()
