@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using ConnectorArcGIS.Utils;
 using DUI3;
 using DUI3.Bindings;
@@ -12,8 +12,9 @@ public static class Factory
   public static List<IBinding> CreateBindings()
   {
     BasicConnectorBinding baseBindings = new(s_store);
+    SendBinding sendBinding = new(s_store);
     List<IBinding> bindingsList =
-      new() { new ConfigBinding("ArcGIS"), new AccountBinding(), new TestBinding(), baseBindings };
+      new() { new ConfigBinding("ArcGIS"), new AccountBinding(), new TestBinding(), baseBindings, sendBinding };
 
     return bindingsList;
   }
